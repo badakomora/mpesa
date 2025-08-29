@@ -1,17 +1,8 @@
-//generateToken.ts
-
 import axios from "axios";
-import { NextFunction, Request, Response } from "express";
 
-export type RequestExtended = Request & { token?: string };
-
-export const generateToken = async (
-  req: RequestExtended,
-  _res: Response,
-  next: NextFunction
-) => {
-  const CONSUMER_KEY = process.env.MPESA_CONSUMER_KEY as string;
-  const CONSUMER_SECRET = process.env.MPESA_CONSUMER_SECRET as string;
+export const generateToken = async (req, _res, next) => {
+  const CONSUMER_KEY = process.env.MPESA_CONSUMER_KEY;
+  const CONSUMER_SECRET = process.env.MPESA_CONSUMER_SECRET;
   const URL =
     "https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials";
 
@@ -27,7 +18,7 @@ export const generateToken = async (
     });
     req.token = response.data.access_token;
     next();
-  } catch (error: any) {
+  } catch (error) {
     throw new Error(`Failed to generate access token: ${error.message}`);
   }
 };
