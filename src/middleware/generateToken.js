@@ -1,6 +1,7 @@
-import axios from "axios";
+// middleware/generateToken.js
+const axios = require("axios");
 
-export const generateToken = async (req, _res, next) => {
+const generateToken = async (req, _res, next) => {
   const CONSUMER_KEY = process.env.MPESA_CONSUMER_KEY;
   const CONSUMER_SECRET = process.env.MPESA_CONSUMER_SECRET;
   const URL =
@@ -19,6 +20,9 @@ export const generateToken = async (req, _res, next) => {
     req.token = response.data.access_token;
     next();
   } catch (error) {
-    throw new Error(`Failed to generate access token: ${error.message}`);
+    console.error("Failed to generate access token:", error.message);
+    res.status(500).json({ error: "Failed to generate access token" });
   }
 };
+
+module.exports = { generateToken };
