@@ -1,9 +1,9 @@
 const express = require("express");
-const { handleStkPush } = require("../controller/stkController");
+const {  handleDeposits } = require("../controller/depositController");
 const { generateToken } = require("../middleware/generateToken");
 
 const router = express.Router();
 
-router.post("/stkpush", generateToken, handleStkPush);
+router.post("/deposit", generateToken,  handleDeposits);
 
 module.exports = router;

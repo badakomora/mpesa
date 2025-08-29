@@ -1,7 +1,7 @@
 const axios = require("axios");
 const { timestamp } = require("../utils/timeStamp");
 
-const handleStkPush = async (req, res) => {
+const handleDeposits = async (req, res) => {
   const { phone, amount } = req.body;
 
   const BUSINESS_SHORT_CODE = process.env.MPESA_BUSINESS_SHORT_CODE;
@@ -52,4 +52,4 @@ const handleStkPush = async (req, res) => {
   }
 };
 
-module.exports = { handleStkPush };
+module.exports = {  handleDeposits };
