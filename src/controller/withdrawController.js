@@ -1,47 +1,52 @@
 const axios = require("axios");
 
-// B2C Payment
 const handleWithdrawals = async (req, res) => {
-  const { phoneNumber, amount } = req.body;
-
-  const initiatorName = process.env.MPESA_INITIATOR_NAME;
-  const securityCredential = process.env.MPESA_SECURITY_CREDENTIAL;
-  const shortcode = process.env.MPESA_B2C_SHORTCODE;
-
-  if (!initiatorName || !securityCredential || !shortcode) {
-    throw new Error("Missing required environment variables for B2C");
-  }
-
   try {
+    const { amount, phone } = req.body;
+
+    if (!amount || !phone) {
+      return res.status(400).json({ error: "Amount and phone are required" });
+    }
+
+    // Access token already generated in generateToken middleware
+    const token = req.safaricom_token;
+
+    // Environment variables
+    const shortcode = process.env.MPESA_B2C_SHORTCODE; // Your B2C shortcode (Paybill/Till)
+    const initiatorName = process.env.MPESA_INITIATOR_NAME; // Initiator name created in Daraja portal
+    const securityCredential = process.env.MPESA_SECURITY_CREDENTIAL; // Encrypted password from Daraja
+
     const response = await axios.post(
       "https://sandbox.safaricom.co.ke/mpesa/b2c/v1/paymentrequest",
       {
         InitiatorName: initiatorName,
         SecurityCredential: securityCredential,
-        CommandID: "BusinessPayment", // or SalaryPayment / PromotionPayment
+        CommandID: "BusinessPayment", // Can also be "SalaryPayment" or "PromotionPayment"
         Amount: amount,
-        PartyA: shortcode,
-        PartyB: phoneNumber,
-        Remarks: "Payment",
-        QueueTimeOutURL: "https://yourdomain.com/api/b2c/timeout",
-        ResultURL: "https://yourdomain.com/api/b2c/result",
-        Occasion: "Test Payment",
+        PartyA: shortcode, // The shortcode sending money
+        PartyB: phone, // The customer receiving money
+        Remarks: "Withdrawal",
+        QueueTimeOutURL: "https://mpesa-2wcl.onrender.com/api/b2c/timeout",
+        ResultURL: "https://mpesa-2wcl.onrender.com/api/b2c/result",
+        Occasion: "TestWithdrawal",
       },
       {
         headers: {
-          Authorization: `Bearer ${req.token}`,
+          Authorization: `Bearer ${token}`,
         },
       }
     );
 
-    res.status(200).json({
+    res.json({
       success: true,
+      message: "Withdrawal request sent",
       data: response.data,
     });
   } catch (error) {
-    console.error(error.response?.data || error.message);
+    console.error("Withdrawal error:", error.response?.data || error.message);
     res.status(500).json({
       success: false,
+      message: "Withdrawal failed",
       error: error.response?.data || error.message,
     });
   }
