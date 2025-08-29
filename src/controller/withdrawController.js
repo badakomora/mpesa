@@ -9,7 +9,8 @@ const handleWithdrawals = async (req, res) => {
     }
 
     // Access token already generated in generateToken middleware
-    const token = req.safaricom_token;
+    const token = req.token;
+
 
     // Environment variables
     const shortcode = process.env.MPESA_B2C_SHORTCODE; // Your B2C shortcode (Paybill/Till)
